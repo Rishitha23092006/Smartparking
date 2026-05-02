@@ -1,0 +1,19 @@
+name : Ci pipeline
+
+on:
+  push :
+    branch:
+       - main
+job:
+  build and push:
+    runs-on : ubuntu-latest
+
+    steps :
+      - name : Checkout code
+        uses : actions/checkout@-v2
+      - name : Docker Login
+        run :  echo "${{secrets.DOCKER_PASSWORD}}" | docker login -u "${{secrets.DOCKER-USERNAME}} --password-stdin"
+      - name : Building docker img
+        run : docker build -t ${{secrets.DOCKER_USERNAME}}/smartparking-app .
+      - name : Push to Docker Hub
+        run : docker push  ${{secrets.DOCKER_USERNAME}}/smartparking-app

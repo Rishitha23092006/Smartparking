@@ -1,6 +1,4 @@
 Django
 djangorestframework
-gunicorn
-psycopg2-binary   # if using postgres
-python-dotenv
+django-cors-headers
 djangorestframework-simplejwt
