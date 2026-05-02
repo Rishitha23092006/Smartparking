@@ -27,6 +27,14 @@ def available_slots(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def all_slots(request):
+    slots = ParkingLot.objects.all()
+    serializer = ParkingLotSerializer(slots, many=True)
+    return Response(serializer.data)
+
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -73,6 +81,30 @@ def user_vehicles(request):
     vehicles = Vehicle.objects.filter(user=request.user)
     serializer = VehicleSerializer(vehicles, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_parking_entries(request):
+    entries = ParkingEntry.objects.filter(
+        vehicle__user=request.user,
+        exit_time__isnull=True
+    ).select_related('slot', 'vehicle')
+    data = []
+    for entry in entries:
+        data.append({
+            'id': entry.id,
+            'vehicle': {
+                'id': entry.vehicle.id,
+                'number': entry.vehicle.number
+            },
+            'slot': {
+                'id': entry.slot.id,
+                'location': entry.slot.location
+            },
+            'entry_time': entry.entry_time
+        })
+    return Response(data)
 
 
 @api_view(['POST'])
